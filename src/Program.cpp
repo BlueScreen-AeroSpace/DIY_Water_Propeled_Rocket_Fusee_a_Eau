@@ -5,7 +5,6 @@ Program::Program() :
      m_jsonManager(nullptr),
      m_connection(nullptr),
      m_WiFiManager(nullptr),
-     m_MQTT_service(nullptr),
      m_BMP280Sensor(nullptr),
      m_ADXL345Sensor(nullptr),
       m_DS1307Clock(nullptr),        
@@ -34,10 +33,7 @@ Program::Program() :
     JsonDocument configDoc = this->m_jsonManager->getConnectionsConfig(); 
 
     this->m_sssidWifi = configDoc["WiFiSSID"].as<String>();                         
-    this->m_wifiPass = configDoc["WiFiPassword"].as<String>();                         
-    this->m_hassUser = configDoc["HASSUser"].as<String>();                              
-    this->m_hassPass = configDoc["HASSPasword"].as<String>();                          
-    this->m_hassServer = configDoc["HASSIP"].as<const char*>();                                 
+    this->m_wifiPass = configDoc["WiFiPassword"].as<String>();                                                        
 
     this->m_connection = new Connection(                                  
         this->m_sssidWifi,
@@ -59,16 +55,6 @@ Program::Program() :
          this->m_DS1307Clock
      );
     this->m_speedManager = new SpeedManager(this->m_BMP280Sensor);           
-    this->m_MQTT_service = new MQTT_Service(                              
-        this->m_BMP280Sensor,
-        this->m_ADXL345Sensor,
-        this->m_speedManager,
-        this->m_hassServer,
-        this->m_hassPort,
-        this->m_hassUser,
-        this->m_hassPass,
-        this->m_jsonManager,
-        this->m_dahRocket);
     this->m_servoMotor = new ServoMotor();
     this->m_actionEjectChute = new ActionEjectChute(this->m_servoMotor);
     this->m_chuteManager = new ChuteManager(
@@ -87,7 +73,6 @@ void Program::loop()
     this->m_ADXL345Sensor->tick();
     
     this->m_speedManager->tick();
-    this->m_MQTT_service->tick();
     this->logData();
     this->m_chuteManager->tick();
 }
