@@ -17,12 +17,7 @@
 class Program {
 private:
     String m_sssidWifi;
-    String m_wifiPass;
-    String m_hassUser;
-    String m_hassPass;
-    const char* m_hassServer;
-    uint16_t m_hassPort;
-    
+    String m_wifiPass;  
     JSONManager* m_jsonManager;
     Connection* m_connection;
     WIFI_Manager* m_WiFiManager;
