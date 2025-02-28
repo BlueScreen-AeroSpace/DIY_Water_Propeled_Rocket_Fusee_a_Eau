@@ -11,7 +11,6 @@
 #include "Managers/JSONManager.h"
 #include "Actions/ActionEjectChute.h"
 #include "Connection.h"
-#include "MQTT_Service.h"
 #include "LED.h"
 #include "Rocket.h"
 
@@ -27,7 +26,6 @@ private:
     JSONManager* m_jsonManager;
     Connection* m_connection;
     WIFI_Manager* m_WiFiManager;
-    MQTT_Service* m_MQTT_service;
     BMP280Sensor* m_BMP280Sensor;
     ADXL345Sensor* m_ADXL345Sensor;
     DS1307Clock* m_DS1307Clock;             
