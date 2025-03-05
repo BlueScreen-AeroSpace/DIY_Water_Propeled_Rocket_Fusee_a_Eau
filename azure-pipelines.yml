@@ -26,7 +26,3 @@ jobs:
       # Run platformIO
       - script: platformio run
         displayName: 'Run PlatformIO'
-
-      # Upload .bin file and modify json file
-      - script: python ./.github/scripts/check_ver_and_deploy.py
-        displayName: 'Upload .bin file and modify JSON file'
