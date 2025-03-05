@@ -90,10 +90,10 @@ void Program::logData() {
             String temp = String(this->m_BMP280Sensor->getTemperature());
             String alt = String(this->m_BMP280Sensor->getAltitude());
             String pres = String(this->m_BMP280Sensor->getPressure());
-            String speed = this->m_speedManager->getSpeed(); 
-            String z = this->m_ADXL345Sensor->getAccelAxeZ();
-            String y = this->m_ADXL345Sensor->getAccelAxeY();
-            String x = this->m_ADXL345Sensor->getAccelAxeX();
+            String speed = String(this->m_speedManager->getSpeed()); 
+            String z = String(this->m_ADXL345Sensor->getAccelAxeZ());
+            String y = String(this->m_ADXL345Sensor->getAccelAxeY());
+            String x = String(this->m_ADXL345Sensor->getAccelAxeX());
 
             String flightData = time+";"+temp+";"+alt+";"+pres+";"+speed+";"+z+";"+y+";"+x;
             this->m_CSV_Logger->logData(flightData);

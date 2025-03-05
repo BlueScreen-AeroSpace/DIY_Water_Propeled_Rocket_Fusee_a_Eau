@@ -22,9 +22,9 @@ private:
 public:
     ADXL345Sensor();
     void tick();
-    String getAccelAxeX();     
-    String getAccelAxeY();
-    String getAccelAxeZ();
+    float getAccelAxeX();     
+    float getAccelAxeY();
+    float getAccelAxeZ();
 
     float getMaxAccelAxeX();
     float getMaxAccelAxeY();

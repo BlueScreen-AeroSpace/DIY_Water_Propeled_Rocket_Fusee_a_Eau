@@ -14,7 +14,7 @@ private:
     void setMaxSpeed();
 public:
     SpeedManager(BMP280Sensor* p_BMP280Sensor);   
-    String getSpeed();
+    float getSpeed();
     float getMaxSpeed();
     void tick();
 };
