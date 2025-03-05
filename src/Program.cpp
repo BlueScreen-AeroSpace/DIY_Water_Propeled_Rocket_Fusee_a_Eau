@@ -1,7 +1,6 @@
 #include "Program.h"
 
 Program::Program() :   
-     m_hassServer(nullptr),
      m_jsonManager(nullptr),
      m_connection(nullptr),
      m_WiFiManager(nullptr),
@@ -84,7 +83,7 @@ void Program::logData() {
         if(this->m_dahRocket->inFlightReady()) {
             if(!this->m_isWrittingNewData) {
                 this->m_CSV_Logger->init();
-                this->timeCounter = DEFAULT_ZERO;
+                this->m_timeCounter = DEFAULT_ZERO;
                 this->m_isWrittingNewData = true;
             }
             String time = String(this->m_timeCounter);
@@ -94,11 +93,11 @@ void Program::logData() {
             String speed = this->m_speedManager->getSpeed(); 
             String z = this->m_ADXL345Sensor->getAccelAxeZ();
             String y = this->m_ADXL345Sensor->getAccelAxeY();
-            String x = this->m_ADXL345Sensor->getAccelAxex();
+            String x = this->m_ADXL345Sensor->getAccelAxeX();
 
             String flightData = time+";"+temp+";"+alt+";"+pres+";"+speed+";"+z+";"+y+";"+x;
             this->m_CSV_Logger->logData(flightData);
-            this->timeCounter += m_interval;
+            this->m_timeCounter += m_interval;
         }
     }
 }
