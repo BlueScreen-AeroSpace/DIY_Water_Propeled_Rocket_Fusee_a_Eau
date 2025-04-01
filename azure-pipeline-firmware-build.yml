@@ -1,0 +1,44 @@
+# azure-pipelines.yml
+trigger:
+  branches:
+    include:
+    - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  projectPath: '$(System.DefaultWorkingDirectory)'  # Chemin vers votre projet Arduino
+  buildDate: $[format('{0:yyyyMMdd}', pipeline.startTime)]  # Format de date AAAAMMJJ
+
+steps:
+- checkout: self
+  displayName: 'Checkout du code source'
+
+- script: |
+    pip install platformio
+    platformio --version
+  displayName: 'Installation de PlatformIO'
+
+- script: |
+    cd $(projectPath)
+    platformio run -e esp32
+  displayName: 'Compilation du firmware ESP32'
+  
+- task: CopyFiles@2
+  inputs:
+    sourceFolder: '$(projectPath)/.pio/build/esp32'
+    contents: 'firmware.bin'
+    targetFolder: '$(Build.ArtifactStagingDirectory)'
+  displayName: 'Copie du firmware compilé'
+
+- script: |
+    cd $(Build.ArtifactStagingDirectory)
+    mv firmware.bin esp32_firmware_$(buildDate).bin
+  displayName: 'Renommage du firmware avec la date'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathToPublish: '$(Build.ArtifactStagingDirectory)'
+    artifactName: 'esp32-firmware-$(buildDate)'
+  displayName: 'Publication de lartefact du firmware'
