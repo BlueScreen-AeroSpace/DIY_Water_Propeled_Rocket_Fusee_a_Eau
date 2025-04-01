@@ -1,4 +1,5 @@
-# azure-pipelines.yml
+name: ESP32-Firmware-Build-CI
+
 trigger:
   branches:
     include:
@@ -21,24 +22,36 @@ steps:
   displayName: 'Installation de PlatformIO'
 
 - script: |
+    pip install esptool
+    esptool.py version
+  displayName: 'Installation de esptool'
+
+- script: |
     cd $(projectPath)
     platformio run -e esp32doit-devkit-v1
   displayName: 'Compilation du firmware ESP32'
-  
+
 - task: CopyFiles@2
   inputs:
-    sourceFolder: '$(projectPath)/.pio/build/esp32'
-    contents: 'firmware.bin'
+    sourceFolder: '$(projectPath)/.pio/build/esp32doit-devkit-v1'
+    contents: '**/*.bin' 
     targetFolder: '$(Build.ArtifactStagingDirectory)'
-  displayName: 'Copie du firmware compilé'
+  displayName: 'Copie des fichiers binaires (firmware, bootloader, partition)'
+
+- script: |
+    ls -l $(Build.ArtifactStagingDirectory)
+  displayName: 'Vérification des fichiers binaires avant fusion'
 
 - script: |
     cd $(Build.ArtifactStagingDirectory)
-    mv firmware.bin esp32_firmware_$(buildDate).bin
-  displayName: 'Renommage du firmware avec la date'
+    python3 -m esptool --chip esp32 merge_bin --output esp32doit-devkit-v1_combined_$(buildDate).bin \
+      0x1000 $(Build.ArtifactStagingDirectory)/bootloader.bin \
+      0x8000 $(Build.ArtifactStagingDirectory)/partitions.bin \
+      0x10000 $(Build.ArtifactStagingDirectory)/firmware.bin
+  displayName: 'Fusion des fichiers binaires (bootloader, partition, firmware)'
 
 - task: PublishBuildArtifacts@1
   inputs:
     pathToPublish: '$(Build.ArtifactStagingDirectory)'
-    artifactName: 'esp32-firmware-$(buildDate)'
+    artifactName: 'esp32doit-devkit-v1-firmware-$(buildDate)'
   displayName: 'Publication de lartefact du firmware'
