@@ -22,7 +22,7 @@ steps:
 
 - script: |
     cd $(projectPath)
-    platformio run -e esp32
+    platformio run -e esp32doit-devkit-v1
   displayName: 'Compilation du firmware ESP32'
   
 - task: CopyFiles@2
