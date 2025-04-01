@@ -1,4 +1,5 @@
 #pragma once
+#include "Modules/Sensor.h"
 #include <SD.h>
 #include <SPI.h>
 #include <Wire.h>

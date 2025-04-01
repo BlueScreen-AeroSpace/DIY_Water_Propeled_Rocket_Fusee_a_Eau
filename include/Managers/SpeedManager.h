@@ -1,9 +1,9 @@
 #pragma once
-#include "Modules/BMP280Sensor.h"
+#include "Modules/BME280Sensor.h"
 
 class SpeedManager {
 private:
-    BMP280Sensor* m_BMP280Sensor;
+    BME280Sensor* m_BME280Sensor;
     float m_actualAltitude;
     float m_previousAltitude;
     float m_actualSpeed;
@@ -13,7 +13,7 @@ private:
     void computeSpeed();
     void setMaxSpeed();
 public:
-    SpeedManager(BMP280Sensor* p_BMP280Sensor);   
+    SpeedManager(BME280Sensor* p_BME280Sensor);   
     float getSpeed();
     float getMaxSpeed();
     void tick();

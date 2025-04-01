@@ -28,7 +28,7 @@
 // BMP280
 #define SDA_PIN 21
 #define SCL_PIN 22
-#define BMP_ADD 0x76                    // SD0 sur GND. Si VCC: 0x77    hey ben si j'utilise Wire.begin() pas besoin de pluger le SDO sur GND ou VCC ADD par défaut 0x76
+#define BME_ADD 0x76                    // SD0 sur GND. Si VCC: 0x77    hey ben si j'utilise Wire.begin() pas besoin de pluger le SDO sur GND ou VCC ADD par défaut 0x76
 #define SEALEVELPRESSURE_HPA (1013.25)
 #define DEGREE "°c"
 #define METER "m"
@@ -47,10 +47,11 @@
 #define SD_MISO 23      //D7    jaune  DI
 #define SD_MOSI 19      //D6    orange DO
 #define CSV ".csv"
+#define DEFAULT_FILENAME "DEFAULT.csv"
 #define CSV_TELEMETRY_HEADER "time;temperature;altitude;pressure;speed;axeZg;axeYg;axeXg"   // Temporaire pour essait, à redéfinir   
 
 // servo motor
-#define SERVO_PIN 25
+#define SERVO_PIN 26
 #define START_POS 0
 #define ROTATE_90 80
 
@@ -82,4 +83,17 @@
 //  PASS "willino.com"      
 
 // LED
-#define PIN_LED 26
+#define PIN_LED 25
+
+// DELPanelManager
+
+#define LED_PIN_PANEL 17
+#define LED_COUNT_PANEL 256
+#define MATRIX_WIDTH_PANEL 16
+#define MATRIX_HEIGHT_PANEL 16
+
+// OLED Display
+
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+#define OLED_ADDR 0x3c

@@ -1,9 +1,10 @@
 #pragma once
+#include "Modules/Sensor.h"
 #include <RTClib.h>
 #include <Arduino.h>
 #include "const.h"
 
-class DS1307Clock {
+class DS1307Clock : public Sensor {
 private:
     RTC_DS1307 m_RTC;
     DateTime m_lastReadTime;

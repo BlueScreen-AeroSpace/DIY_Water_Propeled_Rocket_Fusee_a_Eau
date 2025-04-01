@@ -1,7 +1,10 @@
 #include "Actions/ActionEjectChute.h"
 
-ActionEjectChute::ActionEjectChute(ServoMotor* p_servoMotor) : m_servoMotor(p_servoMotor) { ; }
+// Constructeur de l'action d'éjection du parachute.
+ActionEjectChute::ActionEjectChute(ServoMotor *p_servoMotor) : m_servoMotor(p_servoMotor) { ; }
 
-void ActionEjectChute::execute() {
+// Fonction qui exécute l'action d'éjection
+void ActionEjectChute::execute()
+{
     this->m_servoMotor->Rotate90();
 }
