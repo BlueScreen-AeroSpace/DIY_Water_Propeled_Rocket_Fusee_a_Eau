@@ -1,0 +1,57 @@
+name: ESP32-Firmware-Build-CI
+
+trigger:
+  branches:
+    include:
+    - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  projectPath: '$(System.DefaultWorkingDirectory)'  # Chemin vers votre projet Arduino
+  buildDate: $[format('{0:yyyyMMdd}', pipeline.startTime)]  # Format de date AAAAMMJJ
+
+steps:
+- checkout: self
+  displayName: 'Checkout du code source'
+
+- script: |
+    pip install platformio
+    platformio --version
+  displayName: 'Installation de PlatformIO'
+
+- script: |
+    pip install esptool
+    esptool.py version
+  displayName: 'Installation de esptool'
+
+- script: |
+    cd $(projectPath)
+    platformio run -e esp32doit-devkit-v1
+  displayName: 'Compilation du firmware ESP32'
+
+- task: CopyFiles@2
+  inputs:
+    sourceFolder: '$(projectPath)/.pio/build/esp32doit-devkit-v1'
+    contents: '**/*.bin' 
+    targetFolder: '$(Build.ArtifactStagingDirectory)'
+  displayName: 'Copie des fichiers binaires (firmware, bootloader, partition)'
+
+- script: |
+    ls -l $(Build.ArtifactStagingDirectory)
+  displayName: 'Vérification des fichiers binaires avant fusion'
+
+- script: |
+    cd $(Build.ArtifactStagingDirectory)
+    python3 -m esptool --chip esp32 merge_bin --output esp32doit-devkit-v1_combined_$(buildDate).bin \
+      0x1000 $(Build.ArtifactStagingDirectory)/bootloader.bin \
+      0x8000 $(Build.ArtifactStagingDirectory)/partitions.bin \
+      0x10000 $(Build.ArtifactStagingDirectory)/firmware.bin
+  displayName: 'Fusion des fichiers binaires (bootloader, partition, firmware)'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathToPublish: '$(Build.ArtifactStagingDirectory)'
+    artifactName: 'esp32doit-devkit-v1-firmware-$(buildDate)'
+  displayName: 'Publication de lartefact du firmware'

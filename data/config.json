@@ -1,0 +1,13 @@
+{
+  "sensorConfig": {
+    "BME280": {
+      "active": true
+    },
+    "ADXL345": {
+      "active": true
+    },
+    "DS1307": {
+      "active": true
+    }
+  }
+}

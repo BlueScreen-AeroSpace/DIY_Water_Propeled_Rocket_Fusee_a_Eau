@@ -1,0 +1,31 @@
+trigger: none
+  
+pr:
+  branches:
+    include:
+      - dev
+      - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+jobs:
+  - job: build
+    steps:
+      # Checkout code from the repository
+      # Set up Python
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: '3.x'  # Replace with specific version if necessary
+          addToPath: true
+
+      # Install dependencies
+      - script: |
+          python -m pip install --upgrade pip
+          pip install platformio
+          pip install PyGithub
+        displayName: 'Install Dependencies'
+
+      # Run platformIO
+      - script: platformio run
+        displayName: 'Run PlatformIO'
