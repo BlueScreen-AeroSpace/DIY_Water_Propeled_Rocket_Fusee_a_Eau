@@ -9,8 +9,8 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  projectPath: '$(System.DefaultWorkingDirectory)'  # Chemin vers votre projet Arduino
-  buildDate: $[format('{0:yyyyMMdd}', pipeline.startTime)]  # Format de date AAAAMMJJ
+  projectPath: '$(System.DefaultWorkingDirectory)'  
+  buildDate: $[format('{0:yyyyMMdd}', pipeline.startTime)]
 
 steps:
 - checkout: self
@@ -31,27 +31,53 @@ steps:
     platformio run -e esp32doit-devkit-v1
   displayName: 'Compilation du firmware ESP32'
 
+- script: |
+    cd $(projectPath)
+    platformio run -t buildfs -e esp32doit-devkit-v1
+  displayName: 'Construction de l’image LittleFS'
+
 - task: CopyFiles@2
   inputs:
     sourceFolder: '$(projectPath)/.pio/build/esp32doit-devkit-v1'
     contents: '**/*.bin' 
     targetFolder: '$(Build.ArtifactStagingDirectory)'
   displayName: 'Copie des fichiers binaires (firmware, bootloader, partition)'
-
-- script: |
-    ls -l $(Build.ArtifactStagingDirectory)
-  displayName: 'Vérification des fichiers binaires avant fusion'
-
+  
 - script: |
     cd $(Build.ArtifactStagingDirectory)
-    python3 -m esptool --chip esp32 merge_bin --output esp32doit-devkit-v1_combined_$(buildDate).bin \
+    python3 -m esptool --chip esp32 merge_bin -o esp32doit-devkit_$(buildDate).bin \
+      --flash_mode dio --flash_size 4MB --flash_freq 40m \
       0x1000 $(Build.ArtifactStagingDirectory)/bootloader.bin \
       0x8000 $(Build.ArtifactStagingDirectory)/partitions.bin \
-      0x10000 $(Build.ArtifactStagingDirectory)/firmware.bin
-  displayName: 'Fusion des fichiers binaires (bootloader, partition, firmware)'
+      0x10000 $(Build.ArtifactStagingDirectory)/firmware.bin \
+      0x290000 $(Build.ArtifactStagingDirectory)/littlefs.bin
+  displayName: 'Fusion des fichiers binaires avec LittleFS'
+
 
 - task: PublishBuildArtifacts@1
   inputs:
     pathToPublish: '$(Build.ArtifactStagingDirectory)'
-    artifactName: 'esp32doit-devkit-v1-firmware-$(buildDate)'
+    artifactName: 'esp32doit-devkit_$(buildDate)'
   displayName: 'Publication de lartefact du firmware'
+
+- script: |
+    git clone --branch main $(Build.Repository.Uri) azure-repo
+    cd azure-repo
+    git remote add github https://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@github.com/BlueScreen-AeroSpace/DIY_Water_Propeled_Rocket_Fusee_a_Eau.git
+    git push github main --force
+  displayName: "Copier main d'Azure DevOps vers GitHub"
+
+- task: GitHubRelease@1
+  inputs:
+    gitHubConnection: 'github.com_DavidGagnon86'
+    repositoryName: 'BlueScreen-AeroSpace/DIY_Water_Propeled_Rocket_Fusee_a_Eau'
+    action: 'create'
+    target: 'main'
+    tagSource: 'userSpecifiedTag'
+    tag: 'v$(buildDate)'
+    title: 'Release v$(buildDate)'
+    releaseNotesSource: 'inline'
+    releaseNotes: 'Firmware ESP32 auto-généré.'
+    assets: '$(Build.ArtifactStagingDirectory)/esp32doit-devkit_$(buildDate).bin'
+    assetUploadMode: 'replace'
+  displayName: 'Publication sur GitHub Releases'
