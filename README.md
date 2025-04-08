@@ -6,4 +6,4 @@ Le code source est écrit en C++ et utilise la plateforme ESP32. Le projet est c
 
 ## Autres informations
 
-Vos commentaires ici.
+Vos commentaires ici
