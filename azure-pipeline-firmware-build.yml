@@ -65,7 +65,7 @@ steps:
     git clone --branch main $(Build.Repository.Uri) azure-repo
     cd azure-repo
     git remote add github https://$(GitHubPAT)@github.com/BlueScreen-AeroSpace/DIY_Water_Propeled_Rocket_Fusee_a_Eau.git
-    git push github main --force-with-lease
+    git push github main --force
   displayName: "Copier main d'Azure DevOps vers GitHub"
   env:
     GitHubPAT: $(GitHubPAT)
