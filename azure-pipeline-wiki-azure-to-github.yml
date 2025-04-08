@@ -5,10 +5,8 @@ resources:
     - repository: wikiRepo
       type: git
       name: Fusee/Fusee.wiki
-      trigger:
-        branches:
-          include:
-            - master
+      trigger: true
+        
 
 jobs:
 - job: SyncWikiToGitHub
