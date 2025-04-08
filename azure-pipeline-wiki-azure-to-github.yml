@@ -5,7 +5,10 @@ resources:
     - repository: wikiRepo
       type: git
       name: Fusee/Fusee.wiki
-      trigger: true
+      trigger:
+        branches:
+          include:
+            - master
         
 
 jobs:
