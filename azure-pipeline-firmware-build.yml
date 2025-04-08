@@ -85,3 +85,40 @@ steps:
     assetUploadMode: 'replace'
     addChangeLog: false
   displayName: 'Publication sur GitHub Releases'
+
+- task: Bash@3
+  displayName: 'Génération du Manifest'
+  inputs:
+    targetType: 'inline'
+    script: |
+      VERSION="${{ variables.version }}"
+
+      mkdir -p output
+
+      sed -e "s|{{version}}|$VERSION|g" \
+          template/manifest-template.json > output/manifest-v${{ variables.version }}.json
+
+      echo "Generated file"
+      cat output/manifest-v${{ variables.version }}.json
+
+- task: Bash@3
+  displayName: 'Push le manifest sur Github'
+  inputs:
+    targetType: 'inline'
+    script: |
+      git clone https://$(GitHubPAT)@github.com/BlueScreen-AeroSpace/FirmwareConfig repo
+      
+      cd repo
+      mkdir -p manifest
+      mkdir -p binary
+      cp ../output/manifest-v${{ variables.version }}.json manifest/manifest-v${{ variables.version }}.json
+      cp $(Build.ArtifactStagingDirectory)/esp32doit-devkit_$(version).bin binary/esp32doit-devkit_$(version).bin
+
+      git config user.email "ci-bot@example.com"
+      git config user.name "CI Bot"
+
+      git add .
+      git commit -m "Ajouté manifest"
+      git push origin main
+  env:
+    GitHubPAT: $(GitHubPAT)

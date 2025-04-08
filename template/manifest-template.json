@@ -1,0 +1,15 @@
+{
+  "name": "Fusee Firmware",
+  "version": "{{version}}",
+  "home_assistant_domain": "esphome",
+  "funding_url": "https://esphome.io/guides/supporters.html",
+  "new_install_prompt_erase": false,
+  "builds": [
+    {
+      "chipFamily": "ESP32",
+      "parts": [
+        { "path": "https://bluescreen-aerospace.github.io/FirmwareConfig/binary/esp32doit-devkit_{{version}}.bin", "offset": 0 }
+      ]
+    }
+  ]
+}
