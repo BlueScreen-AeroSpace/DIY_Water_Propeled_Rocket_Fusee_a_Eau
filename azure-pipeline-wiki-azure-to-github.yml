@@ -8,7 +8,7 @@ resources:
       trigger:
         branches:
           include:
-            - main
+            - master
 
 jobs:
 - job: SyncWikiToGitHub
@@ -24,7 +24,7 @@ jobs:
 
         cd temp-wiki
         git init
-        git checkout -b master  # Crée la branche master
+        git checkout -b master
        
         git remote add origin https://$(GitHubPAT)@github.com/BlueScreen-AeroSpace/DIY_Water_Propeled_Rocket_Fusee_a_Eau.wiki.git
         git add Wiki-fusée.md
