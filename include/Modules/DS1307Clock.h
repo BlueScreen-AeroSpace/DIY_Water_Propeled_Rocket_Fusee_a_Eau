@@ -10,7 +10,8 @@ private:
     DateTime m_lastReadTime;
     uint16_t m_interval;
     String formatTwoDigits(uint8_t p_number);
-public:
+    public:
+    void setActualDateAndTime(const String& p_dateAndTime);
     DS1307Clock();
     void refreshTime();
     String getActualDateTime(); 

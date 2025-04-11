@@ -9,8 +9,8 @@
 class DELPanelManager
 {
 private:
-    WS2812Panel *panel;
-    DS1307Clock *clock;
+    WS2812Panel *m_panel;
+    DS1307Clock *m_clock;
     int countdownValue = 10;
     unsigned long previousMillis;
     bool countdownActive = false;
@@ -19,7 +19,7 @@ private:
     int currentFunctionIndex = 0;
 
 public:
-    DELPanelManager(WS2812Panel *_panel, DS1307Clock *_clock);
+    DELPanelManager(DS1307Clock *p_clock);
     void showTime();
     void theFinalCountdown();
     void showAnimationOne();

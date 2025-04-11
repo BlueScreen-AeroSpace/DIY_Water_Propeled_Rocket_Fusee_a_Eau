@@ -1,10 +1,10 @@
 #include "Managers/DELPanelManager.h"
 #include "const.h"
 
-DELPanelManager::DELPanelManager(WS2812Panel *_panel, DS1307Clock *_clock)
+DELPanelManager::DELPanelManager(DS1307Clock *p_clock)
 {
-    panel = _panel;
-    clock = _clock;
+    this->m_panel = new WS2812Panel();
+    this->m_clock = p_clock;
     previousMillis = millis();
 }
 
@@ -15,10 +15,8 @@ void DELPanelManager::setCountdownActive() // Active le compte à rebours
 
 void DELPanelManager::showTime() // Affiche l'heure sur le panneau
 {
-   /*  String time = clock->getActualTimeNoSec();
-    panel->showTime(time); */ // Décommenter pour afficher l'heure actuelle et commenter la ligne suivante
-
-    panel->showTime("13:37");
+    String time = this->m_clock->getActualTimeNoSec();
+    this->m_panel->showTime(time);  
 }
 
 void DELPanelManager::theFinalCountdown() // Compte à rebours
@@ -29,7 +27,7 @@ void DELPanelManager::theFinalCountdown() // Compte à rebours
     {
         previousMillis = currentMillis;
 
-        panel->showCountdown(countdownValue); // Affiche le nombre sur le panneau
+        this->m_panel->showCountdown(countdownValue); // Affiche le nombre sur le panneau
 
         if (countdownValue == 0)
         {
@@ -45,8 +43,7 @@ void DELPanelManager::theFinalCountdown() // Compte à rebours
 
 void DELPanelManager::showAnimationOne()
 {
-    panel->drawRocket(); // Défini dans WS2812Panel
-                               
+    this->m_panel->drawRocket(); // Défini dans WS2812Panel
 }
 
 void DELPanelManager::tick()

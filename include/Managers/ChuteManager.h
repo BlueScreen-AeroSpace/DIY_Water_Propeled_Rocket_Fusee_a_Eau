@@ -4,11 +4,12 @@
 #include "SpeedManager.h"
 #include "const.h"
 
-class ChuteManager {
+class ChuteManager
+{
 private:
-    BME280Sensor* m_BME280Sensor;
-    SpeedManager* m_speedManager;
-    ActionEjectChute* m_actionEjectChute;
+    BME280Sensor *m_BME280Sensor;
+    SpeedManager *m_speedManager;
+    ActionEjectChute *m_actionEjectChute;
     uint64_t m_lastReadTime;
     uint16_t m_interval;
     bool m_isChuteDeployed;
@@ -17,8 +18,8 @@ private:
 
 public:
     ChuteManager(
-        BME280Sensor* p_BME280Sensor,
-        SpeedManager* p_speedManager,
-        ActionEjectChute* m_actionEjectChute);
+        BME280Sensor *p_BME280Sensor,
+        SpeedManager *p_speedManager,
+        ActionEjectChute *m_actionEjectChute);
     void tick();
 };

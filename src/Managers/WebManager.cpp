@@ -2,87 +2,17 @@
 #include "WebServer.h"
 #include "LittleFS.h"
 
-WebManager::WebManager(SensorManager *p_sensorManager)
+WebManager::WebManager(ConfigManager *p_configManager)
 {
     m_webserver = new WebServer(80);
-    m_sensorManager = p_sensorManager;
+    m_configManager = p_configManager;
     m_webserver->on("/", [this]()
                     { this->handleRoot(); });
 
-    m_webserver->on("/api/sensors", HTTP_GET, [this]()
-                    {
-        String jsonResponse = "[";
-        std::vector<Sensor*> sensors = m_sensorManager->getSensors();
-        
-        for(size_t i = 0; i < sensors.size(); i++) {
-            if(i > 0) {
-                jsonResponse += ",";
-            }
-            jsonResponse += "{";
-            jsonResponse += "\"id\":" + String(sensors[i]->getID()) + ",";
-            jsonResponse += "\"state\":" + String(sensors[i]->getState() ? "true" : "false") + ",";
-            jsonResponse += "\"name\":\"" + sensors[i]->getName() + "\"";
-            jsonResponse += "}";
-        }
-        jsonResponse += "]";
-        
-        // Add CORS headers
-        m_webserver->sendHeader("Access-Control-Allow-Origin", "*");
-        m_webserver->sendHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        m_webserver->sendHeader("Access-Control-Allow-Headers", "Content-Type");
-        
-        m_webserver->send(200, "application/json", jsonResponse); });
+    m_webserver->on("/api/config", HTTP_POST, [this]()
+                    { this->sendConfigToManager(); });
 
-    // Handle OPTIONS requests for CORS preflight
-    m_webserver->on("/api/sensors", HTTP_OPTIONS, [this]() {
-        m_webserver->sendHeader("Access-Control-Allow-Origin", "*");
-        m_webserver->sendHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        m_webserver->sendHeader("Access-Control-Allow-Headers", "Content-Type");
-        m_webserver->send(204);
-    });
-
-    m_webserver->on("/api/sensors", HTTP_PUT, [this]()
-                    {
-        // Add CORS headers
-        m_webserver->sendHeader("Access-Control-Allow-Origin", "*");
-        m_webserver->sendHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        m_webserver->sendHeader("Access-Control-Allow-Headers", "Content-Type");
-        
-        if (!m_webserver->hasArg("plain")) {
-            m_webserver->send(400, "text/plain", "Missing body");
-            return;
-        }
-
-        String body = m_webserver->arg("plain");
-        JsonDocument doc;
-        DeserializationError error = deserializeJson(doc, body);
-
-        if (error) {
-            m_webserver->send(400, "application/json", "{\"error\":\"Invalid JSON\"}");
-            return;
-        }
-
-        if (!doc["id"].is<uint8_t>() || !doc["state"].is<bool>()) {
-            m_webserver->send(400, "application/json", "{\"error\":\"Missing id or state in body\"}");
-            return;
-        }
-
-        uint8_t id = doc["id"];
-        bool newState = doc["state"];
-
-        Sensor* sensor = m_sensorManager->getSensor(id);
-        if (!sensor) {
-            m_webserver->send(404, "application/json", "{\"error\":\"Sensor not found\"}");
-            return;
-        }
-
-        if (newState != sensor->getState()) {
-            m_sensorManager->toggleSensorState(id);
-        }
-
-        m_webserver->send(200); });
-
-    m_webserver->serveStatic("/capteurs.js", LittleFS, "/capteurs.js");
+    m_webserver->serveStatic("/script.js", LittleFS, "/script.js");
     m_webserver->serveStatic("/bootstrap/js/bootstrap.min.js", LittleFS, "/bootstrap/js/bootstrap.min.js");
     m_webserver->serveStatic("/bootstrap/css/bootstrap.min.css", LittleFS, "/bootstrap/css/bootstrap.min.css");
     m_webserver->serveStatic("/bootstrap/js/bootstrap.min.js.map", LittleFS, "/bootstrap/js/bootstrap.min.js.map");
@@ -106,6 +36,58 @@ void WebManager::handleRoot()
 
     m_webserver->streamFile(file, "text/html");
     file.close();
+}
+
+#include <ArduinoJson.h>
+
+void WebManager::sendConfigToManager()
+{
+    String jsonRequest = this->m_webserver->arg("plain");
+
+    JsonDocument doc;
+
+    std::vector<String> sensorsToInit = {};
+    std::vector<String> dataTypesChosen = {};
+
+    DeserializationError error = deserializeJson(doc, jsonRequest);
+    Serial.println("Requête POST reçue !");
+
+    if (!error)
+    {
+
+        JsonArray sensorsName = doc["capteurs"].as<JsonArray>();
+        for (JsonVariant sensor : sensorsName)
+        {
+            sensorsToInit.push_back(sensor.as<String>());
+            Serial.println(sensor.as<String>());
+        }
+
+        JsonArray datasName = doc["donnees"].as<JsonArray>();
+        for (JsonVariant dataName : datasName)
+        {
+            dataTypesChosen.push_back(dataName.as<String>());
+            Serial.println(dataName.as<String>());
+        }
+
+        this->m_configManager->setDateAndTimeToInit(doc["dateEtHeure"]);
+        this->m_configManager->setSensorsToInit(sensorsToInit);
+        this->m_configManager->setDataTypesChosen(dataTypesChosen);
+
+        JsonDocument responseDoc;
+        responseDoc["Status"] = "success";
+        responseDoc["message"] = "Configuration traitée";
+        String responseJson;
+        serializeJson(responseDoc, responseJson);
+
+        this->m_webserver->send(200, "application/json", responseJson);
+    }
+    else
+    {
+        Serial.println("Erreur de désérialisation JSON : " + String(error.c_str()));
+        this->m_webserver->send(400, "application/json", R"({"status":"error","message":"JSON invalide"})");
+    }
+
+    this->m_configManager->notifyConfigReceived();
 }
 
 void WebManager::loop()

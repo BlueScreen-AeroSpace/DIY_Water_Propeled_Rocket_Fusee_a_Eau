@@ -13,20 +13,10 @@ DS1307Clock::DS1307Clock() : m_lastReadTime()
     {
         Serial.println("Incapable de démarrer le module DS1307. Vérifiez le câblage.");
         Sensor::m_isActive = false;
-#ifndef DEBUG
-        while (true)
-            ;
-#endif
     }
-    else
-    {
-        Serial.println("Module DS1307 initialisé avec succès");
-    }
-    if (!this->m_RTC.isrunning())
-    {
-        Serial.println("Le RTC n'est pas en marche. Réinitialisation...");
-        this->m_RTC.adjust(DateTime(F(__DATE__), F(__TIME__)));
-    }
+    #ifndef DEBUG
+    Serial.println("Module DS1307 initialisé avec succès");
+    #endif   
 }
 
 // Fonction qui rafraîchie le temps.
@@ -80,7 +70,7 @@ String DS1307Clock::getActualTimeNoSec()
 {
     // Format: 03:35
     refreshTime();
-    String timeString = formatTwoDigits(this->m_lastReadTime.hour()) + "m" +
+    String timeString = formatTwoDigits(this->m_lastReadTime.hour()) + ":" +
                         formatTwoDigits(this->m_lastReadTime.minute());
     return timeString;
 }
@@ -94,4 +84,17 @@ String DS1307Clock::formatTwoDigits(uint8_t p_number)
         return "0" + String(p_number);
     }
     return String(p_number);
+}
+
+void DS1307Clock::setActualDateAndTime(const String& dateTimeStr)
+{
+    int year = dateTimeStr.substring(0, 4).toInt();
+    int month = dateTimeStr.substring(5, 7).toInt();
+    int day = dateTimeStr.substring(8, 10).toInt();
+    int hour = dateTimeStr.substring(11, 13).toInt();
+    int minute = dateTimeStr.substring(14, 16).toInt();
+    int second = dateTimeStr.substring(17, 19).toInt();
+
+    DateTime newDateTime(year, month, day, hour, minute, second);
+    this->m_RTC.adjust(newDateTime);
 }

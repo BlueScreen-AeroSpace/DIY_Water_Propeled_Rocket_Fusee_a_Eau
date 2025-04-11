@@ -14,7 +14,7 @@ BME280Sensor::BME280Sensor()
     if (!m_BME280.begin(BME_ADD))
     { // Simple vérification affiché dans le port série. A servi à détecter que je n'avais pas un BME mais un BMP.
         Sensor::m_isActive = false;
-        Serial.println("Incapable de démarrer le capteur BMP280. Vérifiez l'adresse et le câblage.");
+        Serial.println("Incapable de démarrer le capteur BME280. Vérifiez l'adresse et le câblage.");
 #ifndef DEBUG
         while (true)
             ; // La librairie de ADXL345 m'a montré que c'est une manière de créer une boucle infinie pour arrèter le programme sans cracher mais boucle dans le vide à l'infinie.
@@ -23,11 +23,11 @@ BME280Sensor::BME280Sensor()
     else
     { // Sera utilisé dans tout les objets, à la mise en route de l'esp32 avant le lancement. On pourrait utiliser le LCD. Si problème d'un objet, on connaitra la cause.
       // Au lieu d'un Serial.println() dans le port série COM4, puisque l'esp32 ne sera pas physiquement connecté, on aurait les infos sur le LCD placé sur la fusée.
-        Serial.println("Capteur BMP280 initialisé avec succès.");
+        Serial.println("Capteur BME280 initialisé avec succès.");
     }
-#ifndef DEBUG
+
     setGroundAltitude();
-#endif
+
 }
 
 // Fonction qui vient changer les données membres du BME280.
@@ -136,7 +136,6 @@ void BME280Sensor::tick()
 {
     if (!Sensor::m_isActive)
     {
-        Serial.println("BME280Sensor is not active DO NOT LAUNCH");
         return;
     }
     if (this->m_lastReadTime + this->m_interval < millis())

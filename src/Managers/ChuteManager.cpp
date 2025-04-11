@@ -6,6 +6,7 @@ ChuteManager::ChuteManager(
     SpeedManager *p_speedManager,
     ActionEjectChute *p_actionEjectChute)
     : m_BME280Sensor(p_BME280Sensor),
+      m_speedManager(p_speedManager),
       m_actionEjectChute(p_actionEjectChute),
       m_lastReadTime(DEFAULT_ZERO),
       m_interval(INTERVAL_500),
@@ -16,6 +17,7 @@ bool ChuteManager::isAltitudeDecreasing()
 {
     float altitude = this->m_BME280Sensor->getAltitude();
     float maxAltitude = this->m_BME280Sensor->getMaxAltitude();
+
     bool isAltitudeDecreasing = false;
 
     if (maxAltitude - altitude > MARGIN_ERROR && !this->m_isChuteDeployed)

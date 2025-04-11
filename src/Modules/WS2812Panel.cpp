@@ -9,7 +9,7 @@ WS2812Panel::WS2812Panel()
     FastLED.addLeds<WS2812, LED_PIN_PANEL>(this->ledsPanel, LED_COUNT_PANEL);
     FastLED.clear();
 
-    this->matrix = new FastLED_NeoMatrix(this->ledsPanel, MATRIX_WIDTH_PANEL, MATRIX_HEIGHT_PANEL, NEO_MATRIX_TOP + NEO_MATRIX_LEFT + NEO_MATRIX_COLUMNS + NEO_MATRIX_ZIGZAG);
+    this->matrix = new FastLED_NeoMatrix(this->ledsPanel, MATRIX_WIDTH_PANEL, MATRIX_HEIGHT_PANEL, NEO_MATRIX_BOTTOM + NEO_MATRIX_LEFT + NEO_MATRIX_ROWS + NEO_MATRIX_ZIGZAG);
     this->matrix->begin();
     this->matrix->setTextWrap(false);
     this->matrix->setBrightness(25);
@@ -25,9 +25,9 @@ void WS2812Panel::showTime(String timeString)
     {
         previousMillis = currentMillis; // Mise à jour du dernier temps
 
-        this->matrix->fillScreen(0); // Efface l'écran
-        this->matrix->setFont(NULL); // Utilise la police par défaut
-        this->matrix->setTextSize(1); // Taille du texte
+        this->matrix->fillScreen(0);                                  // Efface l'écran
+        this->matrix->setFont(NULL);                                  // Utilise la police par défaut
+        this->matrix->setTextSize(1);                                 // Taille du texte
         this->matrix->setCursor(position, 4);                         // Position dynamique du texte
         this->matrix->setTextColor(this->matrix->Color(0, 255, 255)); // Texte mauve (GRB)
         this->matrix->print(timeString);

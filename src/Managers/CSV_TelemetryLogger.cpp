@@ -3,22 +3,24 @@
 // Constructeur de télimétrie de fichier CSV.
 CSV_TelemetryLogger::CSV_TelemetryLogger(
     SD_Shield *p_sdShield,
-    DS1307Clock *p_DS1307Clock)
+    DS1307Clock *p_DS1307Clock,
+    ConfigManager *p_configManager)
     : m_sdShield(p_sdShield),
       m_DS1307Clock(p_DS1307Clock),
       m_fileName(EMPTY),
-      m_header(EMPTY)
+      m_header(EMPTY),
+      m_configManager(p_configManager)
 {
 }
 
-// Fonction qui initie la création de l'entête et du fichier CSV. 
+// Fonction qui initie la création de l'entête et du fichier CSV.
 void CSV_TelemetryLogger::init()
 {
     createFileName();
-    createCSVHeader(CSV_TELEMETRY_HEADER);
+    createCSVHeader();
 }
 
-// Fonction qui crée le nom du fichier CSV. 
+// Fonction qui crée le nom du fichier CSV.
 void CSV_TelemetryLogger::createFileName()
 {
     if (m_DS1307Clock)
@@ -34,11 +36,43 @@ void CSV_TelemetryLogger::createFileName()
 }
 
 // Fonction qui crée l'entête du fichier CSV.
-void CSV_TelemetryLogger::createCSVHeader(String p_header)
+void CSV_TelemetryLogger::createCSVHeader()
 {
     if (m_sdShield)
     {
-        this->m_header = p_header;
+        this->m_header = "time;";
+        std::vector<String> dataTypesChosen = this->m_configManager->getDataTypesChosen();
+
+        for (uint8_t i = 0; i < dataTypesChosen.size(); i++)
+        {
+            if (dataTypesChosen[i] == "Température")
+            {
+                m_header += "temperature;";
+            }
+            else if (dataTypesChosen[i] == "Humidité")
+            {
+                m_header += "humidity;";
+            }
+            else if (dataTypesChosen[i] == "Altitude")
+            {
+                m_header += "altitude;";
+            }
+            else if (dataTypesChosen[i] == "Pression Atmosphérique")
+            {
+                m_header += "pressure;";
+            }
+            else if (dataTypesChosen[i] == "Accélération")
+            {
+                m_header += "speed;";
+            } // else if(dataTypesChosen[i] == "Axe z") {
+              // m_header += "axeZg;";
+            // } else if(dataTypesChosen[i] == "Axe y") {
+            //     m_header += "axeYg;";
+            // } else if(dataTypesChosen[i] == "Axe x") {
+            //     m_header += "axeXg;";
+            // }
+        }
+
         this->m_sdShield->writeFile(m_fileName, m_header);
         return;
     }

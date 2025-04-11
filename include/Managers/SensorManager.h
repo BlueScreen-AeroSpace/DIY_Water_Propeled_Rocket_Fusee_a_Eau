@@ -4,18 +4,18 @@
 #include <LittleFS.h>
 #include <ArduinoJson.h>
 
-class SensorManager {
+class SensorManager
+{
 public:
     static constexpr uint8_t MAX_SENSORS = 3;
     SensorManager();
-    void addSensor(Sensor* p_sensor);
-    Sensor* getSensor(uint8_t p_ID);
+    void addSensor(Sensor *p_sensor);
+    Sensor *getSensor(uint8_t p_ID);
     void toggleSensorState(uint8_t p_ID);
-    const std::vector<Sensor*>& getSensors();
-    std::vector<Sensor*> getActivatedSensors();
-    void loadSensors();
+    const std::vector<Sensor *> &getSensors();
+    std::vector<Sensor *> getActivatedSensors();
+
 private:
     uint8_t m_sensorCount = 0;
-    void writeToConfig();
-    std::vector<Sensor*> m_sensors;
-};  
+    std::vector<Sensor *> m_sensors;
+};

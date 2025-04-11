@@ -52,12 +52,12 @@
 
 // servo motor
 #define SERVO_PIN 26
-#define START_POS 0
-#define ROTATE_90 80
+#define START_POS 90
+#define ROTATE_90 0
 
 // ChuteManager , marge d'erreur de 2 metre ou 2 metres seconde pour l'altitude et la vitesse
 #define MARGIN_ERROR 1.25
-
+ 
 // SensorDiscovery 
 // 
 #define TEMP_DISCOVERY_TOPIC "homeassistant/sensor/bmp280_temperature/config"
