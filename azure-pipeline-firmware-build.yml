@@ -110,9 +110,8 @@ steps:
       
       cd repo
       mkdir -p manifest
-      mkdir -p binary
+
       cp ../output/manifest-v${{ variables.version }}.json manifest/manifest-v${{ variables.version }}.json
-      cp $(Build.ArtifactStagingDirectory)/esp32doit-devkit_$(version).bin binary/esp32doit-devkit_$(version).bin
 
       git config user.email "ci-bot@example.com"
       git config user.name "CI Bot"
