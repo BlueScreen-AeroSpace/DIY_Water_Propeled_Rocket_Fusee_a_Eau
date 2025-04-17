@@ -1,36 +1,30 @@
-trigger: none  # Pas de trigger direct sur ce dépôt
-
 resources:
   repositories:
     - repository: wikiRepo
       type: git
       name: Fusee/Fusee.wiki
-      trigger:
-        branches:
-          include:
-            - master
-        
+      trigger: none
 
 jobs:
 - job: SyncWikiToGitHub
-  displayName: "Copier Wiki-fusée.md pour écraser GitHub Wiki"
+  displayName: "Synchroniser le Wiki Azure DevOps avec le Wiki GitHub"
   steps:
     - checkout: wikiRepo
+
     - script: |
         git config --global user.email "wiki-bot@csf-dfc.ca"
         git config --global user.name "Azure DevOps"
 
         mkdir temp-wiki
-        cp "Wiki-fusée.md" temp-wiki/
+        rsync -av --exclude='.git' ./ temp-wiki/
 
         cd temp-wiki
         git init
         git checkout -b master
-       
         git remote add origin https://$(GitHubPAT)@github.com/BlueScreen-AeroSpace/DIY_Water_Propeled_Rocket_Fusee_a_Eau.wiki.git
-        git add Wiki-fusée.md
-        git commit -m "Écrasement de Wiki.md avec Wiki-fusée.md"
-        git push origin master --force  
+        git add .
+        git commit -m "Sync du wiki Azure vers GitHub Wiki"
+        git push origin master --force
       env:
-        GitHubPAT: $(GitHubPAT)  
-      displayName: "Push vers GitHub Wiki pour écraser"
+        GitHubPAT: $(GitHubPAT)
+      displayName: "Pousser tous les fichiers vers GitHub Wiki (force push)"
