@@ -10,6 +10,14 @@ void ConfigManager::setDataTypesChosen(const std::vector<String> &p_datatTypesCh
     }
 }
 
+void ConfigManager::setClock(DS1307Clock* p_clock){
+    this->m_clock = p_clock;
+}
+
+void ConfigManager::setClockTime(){
+    this->m_clock->setActualDateAndTime(this->m_dateAndTimeToInit);
+}
+
 void ConfigManager::setSensorsToInit(const std::vector<String> &sensors)
 {
     this->m_sensorsToInit = sensors;

@@ -1,5 +1,6 @@
 #include "Modules/ADXL345Sensor.h"
 #include "config.h"
+#include "Logs/DataLogger.h"
 
 // Source utilisation et méthodes librairie: adafruit/Adafruit ADXL345@^1.3.4 depuis "PIO Home/Librairies".
 // Aussi guidé par cette exemple: https://www.youtube.com/watch?v=s5Ne0hIaJws
@@ -10,21 +11,18 @@ ADXL345Sensor::ADXL345Sensor()
     Sensor::setName("ADXL345");
     if (!Wire.begin())
     {
-        Serial.println("ADXL345 n'a pas pu être démarré");
+        Logger.error("ADXL345 n'a pas pu être démarré");
     }
 
     if (!this->m_ADXL345.begin())
     {
-        Serial.println("Incapable de démarrer le capteur ADXL345. Vérifiez l'adresse et le câblage.");
+        Logger.error("Incapable de démarrer le capteur ADXL345. Vérifiez l'adresse et le câblage.");
         Sensor::m_isActive = false;
-#ifndef DEBUG
-        while (true)
-            ;
-#endif
     }
     else
     {
-        Serial.println("Capteur ADXL345 initialisé avec succès.");
+        Logger.log("Capteur ADXL345 initialisé avec succès.");
+        Sensor::m_isActive = true;
     }
 }
 

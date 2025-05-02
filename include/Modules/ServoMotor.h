@@ -8,6 +8,7 @@ class ServoMotor : public Sensor {
 private:
     Servo m_servo;
     uint8_t m_position;
+    uint16_t m_interval;
     
 public:
     ServoMotor();

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestion animations</title>
+
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" />
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">Bluescreen Aerospace</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <!-- ms-auto pushes links to the right -->
+            <li class="nav-item">
+              <a class="nav-link" href="/index.html">Index</a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                
+                href="/animations.html"
+                >Animations</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/lancement.html">Lancement</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="/logs.html" aria-current="page">Logs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div id="animations-div">
+      <h3 class="text-center mt-1">Logs</h3>
+      <div>
+        <div class="container mt-4">
+          <div
+            id="console"
+            class="bg-dark text-light p-3 rounded shadow-sm"
+            style="
+              height: 450px;
+              overflow-y: auto;
+              font-family: monospace;
+              font-size: 0.9rem;
+            "
+          ></div>
+        </div>
+      </div>
+    </div>
+    <script>
+      async function afficherLogs() {
+        const consoleDiv = document.getElementById("console");
+
+        const logs = await fetchLogs();
+
+        logs.forEach((log) => {
+          const newLine = document.createElement("div");
+          newLine.textContent = "> " + log.message;
+          if (log.type == "error") {
+            newLine.classList.add("text-danger");
+          }
+          consoleDiv.append(newLine);
+        });
+
+        consoleDiv.scrollTop = consoleDiv.scrollHeight;
+      }
+
+      async function fetchLogs() {
+        try {
+          const response = await fetch("http://192.168.4.1/api/logs");
+          const data = await response.json();
+
+          return data;
+        } catch (err) {
+          console.error("Fetch error:", err);
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", async function () {
+        afficherLogs();
+      });
+    </script>
+  </body>
+</html>

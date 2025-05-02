@@ -1,4 +1,5 @@
-#include "Managers/CSV_TelemetryLogger.h"
+#include "Managers/CSVTelemetryLogger.h"
+#include "Logs/DataLogger.h"
 
 // Constructeur de télimétrie de fichier CSV.
 CSV_TelemetryLogger::CSV_TelemetryLogger(
@@ -9,8 +10,9 @@ CSV_TelemetryLogger::CSV_TelemetryLogger(
       m_DS1307Clock(p_DS1307Clock),
       m_fileName(EMPTY),
       m_header(EMPTY),
-      m_configManager(p_configManager)
+      m_configManager(p_configManager)   
 {
+    init();
 }
 
 // Fonction qui initie la création de l'entête et du fichier CSV.
@@ -18,6 +20,7 @@ void CSV_TelemetryLogger::init()
 {
     createFileName();
     createCSVHeader();
+    Logger.log("Module CSVTelemetryLogger initialisé.");
 }
 
 // Fonction qui crée le nom du fichier CSV.
@@ -60,18 +63,14 @@ void CSV_TelemetryLogger::createCSVHeader()
             else if (dataTypesChosen[i] == "Pression Atmosphérique")
             {
                 m_header += "pressure;";
-            }
+            } 
             else if (dataTypesChosen[i] == "Accélération")
             {
-                m_header += "speed;";
-            } // else if(dataTypesChosen[i] == "Axe z") {
-              // m_header += "axeZg;";
-            // } else if(dataTypesChosen[i] == "Axe y") {
-            //     m_header += "axeYg;";
-            // } else if(dataTypesChosen[i] == "Axe x") {
-            //     m_header += "axeXg;";
-            // }
+                m_header += "axeX;axeY;axeZ;";
+            }
         }
+
+        m_header += "speed;";
 
         this->m_sdShield->writeFile(m_fileName, m_header);
         return;

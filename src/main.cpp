@@ -1,14 +1,14 @@
 #include <Arduino.h>
 #include "Program.h"
+#include "Logs/DataLogger.h"
 
 Program *program = nullptr;
 void setup()
 {
   Serial.begin(SERIAL_SPEED);
 
-  Serial.println("Initialisation...");
+  Logger.log("Initialisation...");
   program = new Program();
-  Serial.println("Programme initialisé");
 }
 
 void loop()

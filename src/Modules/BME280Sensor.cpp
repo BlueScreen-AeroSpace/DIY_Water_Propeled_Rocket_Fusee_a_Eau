@@ -1,5 +1,6 @@
 #include "Modules/BME280Sensor.h"
 #include "config.h"
+#include "Logs/DataLogger.h"
 
 // Constructeur du capteur BME280.
 BME280Sensor::BME280Sensor()
@@ -8,26 +9,27 @@ BME280Sensor::BME280Sensor()
     Sensor::m_isActive = true;
     if (!Wire.begin(SDA_PIN, SCL_PIN))
     {
-        Serial.println("BME280 n'a pas pu être connecté");
+        Logger.error("BME280 n'a pas pu être connecté");
     }
 
     if (!m_BME280.begin(BME_ADD))
     { // Simple vérification affiché dans le port série. A servi à détecter que je n'avais pas un BME mais un BMP.
         Sensor::m_isActive = false;
-        Serial.println("Incapable de démarrer le capteur BME280. Vérifiez l'adresse et le câblage.");
-#ifndef DEBUG
-        while (true)
-            ; // La librairie de ADXL345 m'a montré que c'est une manière de créer une boucle infinie pour arrèter le programme sans cracher mais boucle dans le vide à l'infinie.
-#endif
+        Logger.error("Incapable de démarrer le capteur BME280. Vérifiez l'adresse et le câblage.");
     }
     else
     { // Sera utilisé dans tout les objets, à la mise en route de l'esp32 avant le lancement. On pourrait utiliser le LCD. Si problème d'un objet, on connaitra la cause.
       // Au lieu d'un Serial.println() dans le port série COM4, puisque l'esp32 ne sera pas physiquement connecté, on aurait les infos sur le LCD placé sur la fusée.
-        Serial.println("Capteur BME280 initialisé avec succès.");
+      Logger.log("Capteur BME280 initialisé avec succès.");
     }
-
+    m_BME280.setSampling(
+        Adafruit_BME280::MODE_NORMAL, // Mode de mesure (FORCED ou NORMAL)
+        Adafruit_BME280::SAMPLING_X8, // Température
+        Adafruit_BME280::SAMPLING_X8, // Pression
+        Adafruit_BME280::SAMPLING_X8, // Humidité (non utilisée ici)
+        Adafruit_BME280::FILTER_X4   // Filtrage matériel
+    );
     setGroundAltitude();
-
 }
 
 // Fonction qui vient changer les données membres du BME280.
@@ -92,6 +94,10 @@ float BME280Sensor::getHumidite()
 // Fonction qui retourne la valeur de l'altitude en float.
 float BME280Sensor::getAltitude()
 {
+    if (this->m_altitude < 0)
+    {
+        return 0;
+    }
     return this->m_altitude;
 }
 // Fonction qui retourne la valeur de pression atmosphérique en float.

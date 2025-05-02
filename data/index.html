@@ -1,44 +1,42 @@
 <!DOCTYPE html>
 <html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Gestion des Capteurs</title>
+    
+        <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" />
+        <script src="bootstrap/js/bootstrap.min.js"></script>
+    
+      </head>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des Capteurs</title>
-
-    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
-    <script src="bootstrap/js/bootstrap.min.js"></script>
-
-    <script src="script.js"></script>
-
-    <style>
-        .capteur, .donnee {
-            margin-bottom: 10px;
-        }
-    </style>
-</head>
-
-<body class="text-center">
-    <div class="container mt-4">
-
-        <div id="capteurs-div" style="display: block;">
-            <h1 class="mb-4">Configuration des Capteurs</h1>
-            <div class="d-flex flex-column align-items-center" id="capteurs-list">
+      <body>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+              <a class="navbar-brand" href="#">Bluescreen Aerospace</a>
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+              
+              <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto"> <!-- ms-auto pushes links to the right -->
+                  <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/index.html">Index</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="/animations.html">Animations</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="/lancement.html">Lancement</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="/logs.html">Logs</a>
+                  </li>
+                </ul>
+              </div>
             </div>
-            <button class="btn btn-primary mt-3" onclick="afficherDonnees()">Suivant</button>
-        </div>
-
-
-        <div id="donnees-div" style="display: none;">
-            <h1 class="mb-4">Données Récupérées</h1>
-            <div class="d-flex flex-column align-items-center" id="donnees-list">
-            </div>
-            <div class="mt-3">
-                <button class="btn btn-secondary me-2" style="width: 100px;" onclick="hideDonnees()">Retour</button>
-                <button class="btn btn-primary" style="width: 100px;" id="enregistrer-btn" onclick="postData()">Enregistrer</button>
-            </div>
-        </div>
-    </div>
-</body>
-
+          </nav>
+        <h1>Index</h1>
+      </body>
 </html>

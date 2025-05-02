@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lancement de la fusée</title>
+
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" />
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+  </head>
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">Bluescreen Aerospace</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <!-- ms-auto pushes links to the right -->
+            <li class="nav-item">
+              <a class="nav-link" href="/index.html">Index</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/animations.html">Animations</a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link active"
+                aria-current="page"
+                href="/lancement.html"
+                >Lancement</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/logs.html">Logs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div id="lancement-div">
+      <div class="d-flex justify-content-center align-items-center">
+        <button
+          id="btnLancer"
+          class="btn btn-danger rounded-circle d-flex align-items-center mt-3 justify-content-center shadow"
+          style="width: 300px; height: 300px"
+          onclick="lancerDecollage()"
+        >
+          Lancer
+        </button>
+      </div>
+    </div>
+
+    <script>
+      async function lancerDecollage() {
+        fetch("http://192.168.4.1/api/launch", {
+          method: "POST"
+        })
+          .then((response) => {
+            if (!response.ok) {
+                return response.json().then((errorData) => {
+                    throw new Error(errorData.error || "Erreur inconnue");
+                })
+            }
+            alert("Lancement lancé avec succès");
+          })
+          .catch((error) => {
+            console.error("Erreur lors du lancement :", error);
+            const errorMessage = error instanceof Error ? error.message : error;
+            alert("Échec du lancement: " + errorMessage);
+          });
+      }
+    </script>
+  </body>
+</html>

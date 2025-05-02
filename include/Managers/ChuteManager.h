@@ -11,7 +11,6 @@ private:
     SpeedManager *m_speedManager;
     ActionEjectChute *m_actionEjectChute;
     uint64_t m_lastReadTime;
-    uint16_t m_interval;
     bool m_isChuteDeployed;
     bool isAltitudeDecreasing();
     bool isSpeedAcceleratingFromApogee();

@@ -11,6 +11,7 @@ private:
 
 public:
     Frame(uint16_t duration);
-    uint16_t getDuration();
+    uint16_t getDuration() const;
     void addPixel(Pixel pixel);
+    std::vector<Pixel> &getPixels();
 };

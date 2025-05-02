@@ -1,6 +1,7 @@
 #pragma once
 #include <FastLED.h>
 #include <FastLED_NeoMatrix.h>
+#include "Animation/Frame.h"
 
 class WS2812Panel
 {
@@ -12,9 +13,10 @@ private:
 
 public:
     WS2812Panel();
+    void show();
+    void drawFrame(Frame frame);
+    void eraseScreen();
     void showTime(String timeString);
     void showCountdown(int countdownValue);
-    void drawRocket();
-    uint16_t randomFireColor();
     void tick();
 };

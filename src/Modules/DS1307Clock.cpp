@@ -1,5 +1,6 @@
 #include "Modules/DS1307Clock.h"
 #include "config.h"
+#include "Logs/DataLogger.h"
 
 // Source utilisation et méthodes librairie: adafruit/RTClib@^2.1.4 depuis "PIO Home/Librairies".
 // Filage et utilisation: https://www.instructables.com/Using-the-Wifi-D1-Mini-Real-time-Clock-and-Logger/
@@ -11,12 +12,11 @@ DS1307Clock::DS1307Clock() : m_lastReadTime()
 
     if (!this->m_RTC.begin())
     {
-        Serial.println("Incapable de démarrer le module DS1307. Vérifiez le câblage.");
+        Logger.error("Incapable de démarrer le module DS1307. Vérifiez le câblage.");
         Sensor::m_isActive = false;
     }
-    #ifndef DEBUG
-    Serial.println("Module DS1307 initialisé avec succès");
-    #endif   
+    Logger.log("Module DS1307 initialisé avec succès");
+    Sensor::m_isActive = true;  
 }
 
 // Fonction qui rafraîchie le temps.

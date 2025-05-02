@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestion animations</title>
+
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" />
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">Bluescreen Aerospace</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <!-- ms-auto pushes links to the right -->
+            <li class="nav-item">
+              <a class="nav-link" href="/index.html">Index</a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link active"
+                aria-current="page"
+                href="/animations.html"
+                >Animations</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/lancement.html">Lancement</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/logs.html">Logs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div id="animations-div">
+      <h3 class="text-center mt-1">Animations</h3>
+      <div
+        class="d-flex flex-column align-items-center"
+        id="animations-list"
+      ></div>
+    </div>
+    <script>
+      async function afficherAnimations() {
+        const animationsDiv = document.getElementById("animations-div");
+        const animationsList = document.getElementById("animations-list");
+
+        // Clear previous content
+        animationsList.innerHTML = "";
+
+        const animations = await fetchAnimations();
+        const activeAnimationIndex = await fetchCurrentAnimationIndex();
+
+        if (animations.length === 0) {
+          return;
+        }
+
+        animations.forEach((animation, index) => {
+          const container = document.createElement("div");
+          container.className = "d-flex align-items-center mb-2";
+
+          // Radio button
+          const input = document.createElement("input");
+          input.type = "radio";
+          input.className = "btn-check";
+          input.name = "animationOptions";
+          input.id = `animation${index}`;
+          input.autocomplete = "off";
+          input.value = index;
+
+          // Label
+          const label = document.createElement("label");
+          label.className = "btn btn-outline-primary me-2";
+          label.htmlFor = input.id;
+          label.textContent = animation.name;
+
+          if (index === activeAnimationIndex) {
+            input.checked = true;
+            label.classList.add("active");
+          }
+
+          // Delete button
+          const deleteBtn = document.createElement("button");
+          deleteBtn.className = "btn btn-outline-danger btn-sm";
+          deleteBtn.textContent = "🗑️"; // Trash emoji or use icon if you prefer
+          deleteBtn.onclick = async () => {
+            if (confirm(`Supprimer l'animation "${animation.name}" ?`)) {
+              try {
+                const response = await fetch(
+                  `http://192.168.4.1/api/animation/${index}`,
+                  {
+                    method: "DELETE",
+                  }
+                );
+
+                if (response.ok) {
+                  alert("Animation supprimée !");
+                  afficherAnimations(); // Refresh the list
+                } else {
+                  const errText = await response.text();
+                  alert("Erreur lors de la suppression: " + errText);
+                }
+              } catch (err) {
+                alert("Erreur lors de la suppression: " + err);
+              }
+            }
+          };
+
+          // Attach events and children
+          input.addEventListener("change", async () => {
+            if (input.checked) {
+              document
+                .querySelectorAll("#animations-list label")
+                .forEach((label) => {
+                  label.classList.remove("active");
+                });
+
+              label.classList.add("active");
+
+              await fetch(`http://192.168.4.1/api/animation/${input.value}`, {
+                method: "POST",
+              });
+            }
+          });
+
+          // Append to DOM
+          animationsList.appendChild(input);
+          container.appendChild(label);
+          container.appendChild(deleteBtn);
+          animationsList.appendChild(container);
+        });
+      }
+      async function fetchAnimations() {
+        try {
+          const response = await fetch("http://192.168.4.1/api/animation");
+          if (!response.ok) {
+            throw new Error("Error fetching animations");
+          }
+          const data = await response.json();
+
+          return data;
+        } catch (err) {
+          console.error("Fetch error:", err);
+        }
+      }
+
+      async function fetchCurrentAnimationIndex() {
+        try {
+          const response = await fetch(
+            "http://192.168.4.1/api/animation/active"
+          );
+          if (!response.ok) {
+            throw new Error("Error fetching the animation index");
+          }
+          const text = await response.text();
+          const activeId = parseInt(text, 10);
+          console.log(activeId);
+
+          return activeId;
+        } catch (error) {
+          console.error(error);
+          return null;
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", async function () {
+        afficherAnimations();
+      });
+    </script>
+  </body>
+</html>
