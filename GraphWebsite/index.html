@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV Data Visualization</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-800">
+    <div class="flex justify-center">
+        <div class="flex flex-col">
+            <div class="my-5 text-center">
+                <h3 class="text-slate-200">Téléverser le fichier CSV: </h3>
+                <input type="file" id="csvFileInput" class="text-slate-200" accept=".csv">
+            </div>
+            <div class="invisible" id="altitudeChartDiv">
+                <div class="text-center mt-2">
+                    <h2 class="text-slate-200">Altitude vs Temps</h2>
+                </div>
+                <canvas id="altitudeChart" class="bg-slate-600"></canvas>
+            </div>
+
+            <div class="invisible" id="pressureChartDiv">
+                <div class="text-center mt-2">
+                    <h2 class="text-slate-200">Pression vs Temps</h2>
+                </div>
+                <canvas id="pressureChart" class="bg-slate-600"></canvas>
+            </div>
+
+            <div class="invisible" id="tempChartDiv">
+                <div class="text-center mt-2">
+                    <h2 class="text-slate-200">Température vs Temps</h2>
+                </div>
+                <canvas id="tempChart" class="bg-slate-600"></canvas>
+            </div>
+
+            <div class="invisible" id="speedChartDiv">
+                <div class="text-center mt-2">
+                    <h2 class="text-slate-200">Vitesse vs Temps</h2>
+                </div>
+                <canvas id="speedChart" class="bg-slate-600"></canvas>
+            </div>
+
+            <div class="invisible" id="accelChartDiv">
+                <div class="text-center mt-2">
+                    <h2 class="text-slate-200">Accélération vs Temps</h2>
+                </div>
+                <canvas id="accelChart" class="bg-slate-600"></canvas>
+            </div>
+        </div>
+
+
+    </div>
+
+
+    <script>
+        let charts = {};
+
+        document.getElementById("csvFileInput").addEventListener("change", function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const csvText = e.target.result;
+                    const parsedData = parseCSV(csvText);
+                    createChart("altitudeChart", "Altitude", parsedData.time, parsedData.altitude, "#8789ff");
+                    createChart("pressureChart", "Pression", parsedData.time, parsedData.pressure, "#8789ff");
+                    createChart("tempChart", "Température", parsedData.time, parsedData.temperature, "#8789ff");
+                    createChart("speedChart", "Vitesse", parsedData.time, parsedData.speed, "#8789ff");
+                    createChart("accelChart", "Accélération", parsedData.time, parsedData.axeZg, "#8789ff");
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        function parseCSV(csv) {
+            const rows = csv.trim().split("\n").map(row => row.split(";"));
+            const headers = rows.shift(); // Remove header row
+            const data = rows.map(row => row.map(value => parseFloat(value)));
+
+            return {
+                time: data.map(row => row[0]),
+                temperature: data.map(row => row[1]),
+                altitude: data.map(row => row[2]),
+                pressure: data.map(row => row[3]),
+                speed: data.map(row => row[4]),
+                axeZg: data.map(row => row[5]),
+                axeYg: data.map(row => row[6]),
+                axeXg: data.map(row => row[7])
+            };
+        }
+
+        function createChart(canvasId, label, xData, yData, color) {
+            if (charts[canvasId]) {
+                charts[canvasId].destroy();
+            }
+
+            const canvas = document.getElementById(canvasId);
+            if (canvas) {
+                let divId = canvasId + "Div";
+                const canvasDiv = document.getElementById(divId);
+                canvas.width = 800;
+                canvas.height = 400;
+                canvasDiv.classList += "visible";
+            }
+
+
+            charts[canvasId] = new Chart(canvas, {
+                type: "line",
+                data: {
+                    labels: xData,
+                    datasets: [{
+                        label: label,
+                        data: yData,
+                        borderColor: color,
+                        borderWidth: 2,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: "white"
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: "Temps", color: "white" },
+                            grid: { color: "white" },
+                            ticks: { color: "white" }
+                        },
+                        y: {
+                            title: { display: true, text: label, color: "white" },
+                            grid: { color: "white" },
+                            ticks: { color: "white" }
+                        },
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

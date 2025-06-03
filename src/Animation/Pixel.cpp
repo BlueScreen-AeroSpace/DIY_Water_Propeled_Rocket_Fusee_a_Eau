@@ -1,28 +1,27 @@
 #include "Animation/Pixel.h"
 
-Pixel::Pixel(uint8_t x, uint8_t y, Color *color)
+Pixel::Pixel(uint8_t x, uint8_t y)
 {
     this->x = x;
     this->y = y;
-    this->color = color;
 }
 
-Color *Pixel::getColor()
+const Color& Pixel::getColor() const
 {
     return this->color;
 }
 
-uint8_t Pixel::getX()
+uint8_t Pixel::getX() const
 {
     return this->x;
 }
 
-uint8_t Pixel::getY()
+uint8_t Pixel::getY() const
 {
     return this->y;
 }
 
-void Pixel::setColor(Color *color)
+void Pixel::setColor(const Color& color)
 {
     this->color = color;
 }

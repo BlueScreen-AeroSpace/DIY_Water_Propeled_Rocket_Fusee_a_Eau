@@ -42,7 +42,7 @@ bool ChuteManager::isSpeedAcceleratingFromApogee()
 // Fonction qui écoute les états de chute de la fusée et qui agit en considération afin de déclencher le parachute.
 void ChuteManager::tick()
 {
-    if (this->m_lastReadTime + INTERVAL_100 < millis())
+    if (this->m_lastReadTime + INTERVAL_50 < millis())
     {
         this->m_lastReadTime = millis();
         if (isSpeedAcceleratingFromApogee())

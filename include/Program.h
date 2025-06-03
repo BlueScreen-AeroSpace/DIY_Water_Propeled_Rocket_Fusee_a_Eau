@@ -19,6 +19,7 @@
 #include "Managers/DataLoggerManager.h"
 #include "Managers/WebSerialManager.h"
 #include "Managers/WebSerialCommandInterpreter.h"
+#include "Managers/CustomDNS.h"
 
 class Program
 {
@@ -41,6 +42,7 @@ private:
     DataLoggerManager *m_dataLoggerManager = nullptr;
     WebManager *m_webManager = nullptr;
     WebSerialManager *m_webSerialManager = nullptr;
+    CustomDNS *m_DNS = nullptr;
 
     void initMembers();
     void initManagers();

@@ -47,7 +47,7 @@ void DataLoggerManager::setIsReadyToLogData()
 
 void DataLoggerManager::logData()
 {
-    if (this->m_timeCounter != MAX_DATA_RECORD_TIME)
+    if (this->m_timeCounter <= 90000)
     {
         if (this->m_isReadyToLogData)
         {
@@ -59,7 +59,6 @@ void DataLoggerManager::logData()
                 Serial.println("ERREUR : Un des pointeurs est nul dans logData()");
                 return;
             }
-            Serial.println("Les capteurs sont initialises");
 
             if (this->m_lastReadTime + this->m_interval <= millis())
             {

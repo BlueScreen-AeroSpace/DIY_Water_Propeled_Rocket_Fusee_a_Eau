@@ -102,7 +102,7 @@
             if (confirm(`Supprimer l'animation "${animation.name}" ?`)) {
               try {
                 const response = await fetch(
-                  `http://192.168.4.1/api/animation/${index}`,
+                  `http://fusee.bsas/api/animation/${index}`,
                   {
                     method: "DELETE",
                   }
@@ -132,7 +132,7 @@
 
               label.classList.add("active");
 
-              await fetch(`http://192.168.4.1/api/animation/${input.value}`, {
+              await fetch(`http://fusee.bsas/api/animation/${input.value}`, {
                 method: "POST",
               });
             }
@@ -147,7 +147,7 @@
       }
       async function fetchAnimations() {
         try {
-          const response = await fetch("http://192.168.4.1/api/animation");
+          const response = await fetch("http://fusee.bsas/api/animation");
           if (!response.ok) {
             throw new Error("Error fetching animations");
           }
@@ -162,7 +162,7 @@
       async function fetchCurrentAnimationIndex() {
         try {
           const response = await fetch(
-            "http://192.168.4.1/api/animation/active"
+            "http://fusee.bsas/api/animation/active"
           );
           if (!response.ok) {
             throw new Error("Error fetching the animation index");

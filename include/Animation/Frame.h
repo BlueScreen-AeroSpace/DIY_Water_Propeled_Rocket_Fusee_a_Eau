@@ -7,11 +7,9 @@ class Frame
 {
 private:
     std::vector<Pixel> pixels;
-    int duration;
-
 public:
-    Frame(uint16_t duration);
-    uint16_t getDuration() const;
-    void addPixel(Pixel pixel);
-    std::vector<Pixel> &getPixels();
+    Frame();
+    void addPixel(const Pixel& pixel);
+    const std::vector<Pixel> &getPixels() const;
+    uint16_t getNumPixels() const;
 };

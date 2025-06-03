@@ -2,6 +2,7 @@
 #include "const.h"
 #include <LittleFS.h>
 #include "Logs/DataLogger.h"
+#include "Animation/AnimationSerializer.h"
 
 DELPanelManager::DELPanelManager(DS1307Clock *p_clock, DataLoggerManager *p_dataLoggerManager)
 {
@@ -11,18 +12,17 @@ DELPanelManager::DELPanelManager(DS1307Clock *p_clock, DataLoggerManager *p_data
     previousMillis = millis();
 
     currentAnimationIndex = 0;
-
-    loadAnimationsFromFileSystem();
+    this->loadAnimations();
 
     Logger.log("Module DELPanelManager initialisé");
 }
 
-void DELPanelManager::setCountdownActive() 
+void DELPanelManager::setCountdownActive()
 {
     countdownActive = true;
 }
 
-const std::vector<Animation> & DELPanelManager::getAnimations()
+const std::vector<Animation> &DELPanelManager::getAnimations()
 {
     return this->animations;
 }
@@ -34,26 +34,27 @@ bool DELPanelManager::getCountDownActive()
 
 bool DELPanelManager::setCurrentAnimationIndex(u_int8_t p_index)
 {
-    if (p_index < animations.size() && p_index >= 0) 
+    if (p_index < animations.size() && p_index >= 0)
     {
-        currentAnimationIndex = p_index; 
+        currentAnimationIndex = p_index;
+        m_panel->eraseScreen();
         return true;
     }
     return false;
 }
 Animation *DELPanelManager::getAnimationById(int p_index)
 {
-    if (p_index < animations.size() && p_index >= 0) 
+    if (p_index < animations.size() && p_index >= 0)
     {
-        return &animations[p_index]; 
+        return &animations[p_index];
     }
-    return nullptr; 
+    return nullptr;
 }
 
-const Animation* DELPanelManager::getAnimationByName(const String& name)
+const Animation *DELPanelManager::getAnimationByName(const String &name)
 {
-    const Animation* foundAnimation = nullptr;
-    for (const Animation& animation: this->getAnimations())
+    const Animation *foundAnimation = nullptr;
+    for (const Animation &animation : this->getAnimations())
     {
         if (animation.getName() == name)
         {
@@ -65,232 +66,36 @@ const Animation* DELPanelManager::getAnimationByName(const String& name)
     return foundAnimation;
 }
 
+bool DELPanelManager::deleteAnimationByName(const String& name)
+{
+    for (int i = 0; i < this->animations.size(); i++)
+    {
+        if (animations[i].getName() == name)
+        {
+            this->animations.erase(animations.begin() + i);
+            return true;
+        }
+    }
+    return false;
+}
+
 bool DELPanelManager::deleteAnimationById(int p_index)
 {
-    if (p_index < animations.size() && p_index >= 0) 
+    if (p_index < animations.size() && p_index >= 0)
     {
-        animations.erase(animations.begin() + p_index); 
+        animations.erase(animations.begin() + p_index);
         if (p_index > 0)
         {
             currentAnimationIndex--;
         }
-        this->saveAnimations();
         return true;
     }
     return false;
 }
 
-void DELPanelManager::parseJsontoAnimation(const String &jsonString)
-{
-    JsonDocument doc;
-    DeserializationError error = deserializeJson(doc, jsonString);
-
-    if (error)
-    {
-        Logger.error(String("Animation deserialization failed: ") + error.c_str());
-        return;
-    }
-
-    JsonArray animationsArray = doc["animations"].as<JsonArray>();
-
-    for (JsonObject animationJson : animationsArray)
-    {
-        Animation *animation = new Animation(); // Crée une nouvelle animation
-        String name = animationJson["name"];
-        animation->setName(name); // Défini le nom de l'animation
-
-        JsonArray framesArray = animationJson["frames"];
-
-        for (JsonObject frameJson : framesArray)
-        {
-            Frame frame(INTERVAL_200); // Ajuste la durée si besoin
-
-            JsonArray pixelsArray = frameJson["pixels"];
-
-            for (JsonObject pixelJson : pixelsArray)
-            {
-                uint8_t x = pixelJson["x"];
-                uint8_t y = pixelJson["y"];
-                JsonObject colorJson = pixelJson["color"];
-                uint8_t r = colorJson["r"];
-                uint8_t g = colorJson["g"];
-                uint8_t b = colorJson["b"];
-
-                Color *color = new Color(r, g, b);
-                Pixel pixel(x, y, color);
-                frame.addPixel(pixel);
-            }
-
-            animation->addFrame(frame);
-        }
-
-        addAnimationToVector(*animation);
-    }
-}
-
-void DELPanelManager::loadAnimationsFromFileSystem()
-{
-    File file = LittleFS.open("/animations.json", "r");
-
-    if (!file)
-    {
-        Logger.error("Erreur: Impossible d'ouvrir le fichier animations.json");
-        return;
-    }
-
-    String jsonContent = "";
-    while (file.available())
-    {
-        jsonContent += (char)file.read();
-    }
-    file.close();
-
-    parseJsontoAnimation(jsonContent); 
-}
-
-bool DELPanelManager::loadAnimationFromJson(const String& jsonString)
-{
-    JsonDocument doc;
-    DeserializationError error = deserializeJson(doc, jsonString);
-    
-    if (error)
-    {
-        Logger.error(String("Animation deserialization failed: ") + error.c_str());
-        return false;
-    }
-
-    Animation *animation = new Animation(); // Crée une nouvelle animation
-    String name = doc["name"];
-    animation->setName(name); // Défini le nom de l'animation
-
-    JsonArray framesArray = doc["frames"];
-
-    for (JsonObject frameJson : framesArray)
-    {
-        Frame frame(INTERVAL_200); // Ajuste la durée si besoin
-
-        JsonArray pixelsArray = frameJson["pixels"];
-
-        for (JsonObject pixelJson : pixelsArray)
-        {
-            uint8_t x = pixelJson["x"];
-            uint8_t y = pixelJson["y"];
-            JsonObject colorJson = pixelJson["color"];
-            uint8_t r = colorJson["r"];
-            uint8_t g = colorJson["g"];
-            uint8_t b = colorJson["b"];
-
-            Color *color = new Color(r, g, b);
-            Pixel pixel(x, y, color);
-            frame.addPixel(pixel);
-        }
-
-        animation->addFrame(frame);
-    }
-
-    for (int i = 0; i < this->animations.size(); i++)
-    {
-        if (animations[i].getName() == name)
-        {
-            this->deleteAnimationById(i);
-            break;
-        }
-    }
-
-    addAnimationToVector(*animation);
-    saveAnimations();
-    return true;
-}
-
 int DELPanelManager::getCurrentAnimationIndex()
 {
     return this->currentAnimationIndex;
-}
-
-void DELPanelManager::addAnimationToVector(const Animation& animation)
-{
-    Logger.log("Animation ajouté: " + animation.getName());
-    animations.push_back(animation);
-}
-
-void DELPanelManager::serializeAnimation(const Animation& animation, JsonObject& animObj)
-{
-    // Ajouter le nom de l'animation
-    animObj["name"] = animation.getName();
-
-    // Créer un tableau pour les frames
-    JsonArray framesArray = animObj["frames"].to<JsonArray>();
-
-    // Parcourir toutes les frames de cette animation
-    std::vector<Frame> frames = animation.getFrames();
-    for (Frame &frame : frames)
-    {
-        JsonObject frameObj = framesArray.add<JsonObject>();
-
-        // Créer un tableau pour les pixels
-        JsonArray pixelsArray = frameObj["pixels"].to<JsonArray>();
-
-        // Parcourir tous les pixels de cette frame
-        std::vector<Pixel> &pixels = frame.getPixels();
-
-        for (Pixel &pixel : pixels)
-        {
-            JsonObject pixelObj = pixelsArray.add<JsonObject>();
-
-            // Ajouter les coordonnées du pixel
-            pixelObj["x"] = pixel.getX();
-            pixelObj["y"] = pixel.getY();
-
-            // Ajouter la couleur
-            JsonObject colorObj = pixelObj["color"].to<JsonObject>();
-            Color *color = pixel.getColor();
-            colorObj["r"] = color->getR();
-            colorObj["g"] = color->getG();
-            colorObj["b"] = color->getB();
-        }
-    }
-}
-
-bool DELPanelManager::saveAnimations()
-{
-    if (!LittleFS.begin())
-    {
-        Logger.error("Erreur lors du montage de LittleFS");
-        return false;
-    }
-
-    // Créer un document JSON
-    JsonDocument doc;
-
-    // Créer un tableau pour les animations
-    JsonArray animationsArray = doc["animations"].to<JsonArray>();
-
-    // Parcourir toutes les animations
-    for (Animation &animation : animations)
-    {
-        JsonObject animObj = animationsArray.add<JsonObject>();
-        serializeAnimation(animation, animObj);
-    }
-
-    // Ouvrir le fichier en mode écriture (cela va écraser le fichier existant)
-    File file = LittleFS.open("/animations.json", "w");
-
-    if (!file)
-    {
-        Logger.error("Erreur: Impossible d'ouvrir le fichier animations.json en écriture");
-        return false;
-    }
-
-    // Sérialiser le JSON dans le fichier
-    if (serializeJson(doc, file) == 0)
-    {
-        Logger.error("Erreur lors de l'écriture du JSON dans le fichier");
-        file.close();
-        return false;
-    }
-
-    file.close();
-    return true;
 }
 
 void DELPanelManager::showTime() // Affiche l'heure sur le panneau
@@ -322,14 +127,76 @@ void DELPanelManager::theFinalCountdown() // Compte à rebours
     }
 }
 
+void DELPanelManager::loadAnimations()
+{
+    File dir = LittleFS.open("/animations");
+
+    if (!dir || !dir.isDirectory())
+    {
+        Logger.error("Failed to open /animations directory");
+    }
+
+    File file = dir.openNextFile();
+    while (file)
+    {
+        String fileName = file.name();
+
+        if (!file.isDirectory() && fileName.endsWith(".bin"))
+        {
+            size_t size = file.size();
+            uint8_t *buffer = new uint8_t[size];
+
+            file.read(buffer, size);
+            Animation animation = AnimationSerializer::deserialize(buffer, 0);
+
+            this->addAnimationToVector(animation);
+
+            delete[] buffer;
+            Logger.log("Loaded animation: " + animation.getName());
+        }
+        file = dir.openNextFile();
+    }
+}
+
+void DELPanelManager::addAnimationToVector(const Animation &animation)
+{
+    this->animations.push_back(animation);
+}
+
+bool DELPanelManager::saveAnimation(const Animation &animation)
+{
+    if (!LittleFS.exists("/animations"))
+    {
+        if (!LittleFS.mkdir("/animations"))
+        {
+            Logger.error("Failed to create the animations folder");
+            return false;
+        }
+    }
+
+    String path = String("/animations/") + animation.getNameNormalized() + String(".bin");
+    File file = LittleFS.open(path, "w");
+
+    if (!file)
+    {
+        Logger.error("Failed to create file " + path);
+        return false;
+    }
+    size_t animationSize = 0;
+    const uint8_t *animationBytes = AnimationSerializer::serialize(animation, animationSize);
+
+    file.write(animationBytes, animationSize);
+    return true;
+}
+
 void DELPanelManager::tick()
 {
     unsigned long currentTime = millis();
-
+    static bool frameNull = false;
     if (!animations.empty() && currentAnimationIndex < animations.size() && !this->countdownActive)
     {
         Animation &currentAnimation = animations[currentAnimationIndex];
-        const std::vector<Frame>& frames = currentAnimation.getFrames();
+        const std::vector<Frame> &frames = currentAnimation.getFrames();
 
         if (frames.empty())
         {
@@ -341,11 +208,15 @@ void DELPanelManager::tick()
         const Frame *currentFrame = currentAnimation.getFrame(frameIndex);
         if (currentFrame == nullptr)
         {
+            frameNull = true;
+            if (frameNull) 
+            {
+                Logger.error("Null frame");
+            }
             return;
         }
-        unsigned long frameDuration = currentFrame->getDuration();
 
-        if (currentTime - lastFrameUpdateTime >= frameDuration)
+        if (currentTime - lastFrameUpdateTime >= INTERVAL_200)
         {
             lastFrameUpdateTime = currentTime;
 

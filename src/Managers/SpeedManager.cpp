@@ -9,7 +9,7 @@ SpeedManager::SpeedManager(BME280Sensor *p_BME280Sensor)
       m_actualSpeed(DEFAULT_ZERO),
       m_maxSpeed(DEFAULT_ZERO),
       m_previousTimeSpeed(DEFAULT_ZERO),
-      m_interval(INTERVAL_100),
+      m_interval(INTERVAL_75),
       m_previousTime(DEFAULT_ZERO)
 {
     Logger.log("Module SpeedManager initialisé");

@@ -29,7 +29,7 @@ private:
 
     Adafruit_BME280 m_BME280;
     uint64_t m_lastReadTime = 0;
-    uint16_t m_interval = 100;
+    uint16_t m_interval = INTERVAL_50;
 
     void setMembersValues();
     void setMaxValues();

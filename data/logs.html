@@ -85,7 +85,7 @@
 
       async function fetchLogs() {
         try {
-          const response = await fetch("http://192.168.4.1/api/logs");
+          const response = await fetch("http://fusee.bsas/api/logs");
           const data = await response.json();
 
           return data;

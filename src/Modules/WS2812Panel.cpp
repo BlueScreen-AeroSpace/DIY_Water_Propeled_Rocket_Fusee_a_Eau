@@ -25,9 +25,9 @@ void WS2812Panel::show()
 
 void WS2812Panel::drawFrame(Frame frame)
 {
-    for (Pixel pixel : frame.getPixels())
+    for (const Pixel& pixel : frame.getPixels())
     {
-        this->matrix->drawPixel(pixel.getX(), pixel.getY(), this->matrix->Color(pixel.getColor()->getG(), pixel.getColor()->getR(), pixel.getColor()->getB())); // Utilise la couleur RGB
+        this->matrix->drawPixel(pixel.getX(), pixel.getY(), this->matrix->Color(pixel.getColor().getG(), pixel.getColor().getR(), pixel.getColor().getB())); // Utilise la couleur RGB
     }
 }
 

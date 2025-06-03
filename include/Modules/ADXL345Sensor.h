@@ -19,7 +19,7 @@ private:
     Adafruit_ADXL345_Unified m_ADXL345 = Adafruit_ADXL345_Unified();
 
     uint64_t m_lastReadTime = 0;
-    uint16_t m_interval = 100;
+    uint16_t m_interval = INTERVAL_75;
     void setMembersValues();
     void setMaxValues();
 public:

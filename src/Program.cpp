@@ -25,6 +25,7 @@ Program::Program()
     this->m_launchManager = new LaunchManager(this->m_DELPanelManager);
     this->m_webManager = new WebManager(this->m_configManager, this->m_dataLoggerManager, this->m_DELPanelManager, this->m_launchManager);
     this->m_webSerialManager = new WebSerialManager(new WebSerialCommandInterpreter(m_DELPanelManager));
+    this->m_DNS = new CustomDNS(WiFi.softAPIP(), CUSTOM_DNS);
     Logger.log("Programme initialisé");
 }
 
@@ -57,8 +58,6 @@ void Program::initManagers()
         this->m_BME280Sensor,
         this->m_speedManager,
         this->m_actionEjectChute);
-    
-    
 }
 
 void Program::initMembers()
@@ -74,6 +73,8 @@ void Program::initMembers()
 
 void Program::loop()
 {
+    this->m_DNS->tick();
+
     if (this->m_configManager->isConfigReceived())
     {
         if (!this->m_areMembersInitialised)
@@ -83,11 +84,11 @@ void Program::loop()
         else
         {
 #ifndef DEBUG
-            if (this->m_BME280Sensor != nullptr)
+            if (this->m_BME280Sensor != nullptr && this->m_DELPanelManager->m_isCountDownFinish)
             {
                 this->m_BME280Sensor->tick();
             }
-            if (this->m_ADXL345Sensor != nullptr)
+            if (this->m_ADXL345Sensor != nullptr && this->m_DELPanelManager->m_isCountDownFinish)
             {
                 this->m_ADXL345Sensor->tick();
             }
@@ -97,7 +98,7 @@ void Program::loop()
 
             this->m_dataLoggerManager->logData();
 #endif
-            this->m_DELPanelManager->tick();           
+            this->m_DELPanelManager->tick();
         }
     }
     this->m_webSerialManager->tick();

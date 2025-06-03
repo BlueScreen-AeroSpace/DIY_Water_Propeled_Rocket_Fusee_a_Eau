@@ -33,22 +33,28 @@ private:
     unsigned long lastFrameUpdateTime = 0; // Temps du dernier changement de frame
 
 public:
+    bool m_isCountDownFinish = false;
     DELPanelManager(DS1307Clock *p_clock, DataLoggerManager *p_dataLoggerManager);
+    
+    
+    const std::vector<Animation> &getAnimations();
+    
+    void showTime();
+    void theFinalCountdown();
+
+    void loadAnimations();
+    void addAnimationToVector(const Animation& animation);
+    bool saveAnimation(const Animation& animation);
     Animation *getAnimationById(int p_index);
     const Animation *getAnimationByName(const String& name);
     bool deleteAnimationById(int p_index);
-    const std::vector<Animation> &getAnimations();
-    bool setCurrentAnimationIndex(u_int8_t p_index);
-    void showTime();
-    void theFinalCountdown();
+    bool deleteAnimationByName(const String& name);
+
     void setCountdownActive();
-    void parseJsontoAnimation(const String &jsonString);
-    void loadAnimationsFromFileSystem();
-    void addAnimationToVector(const Animation& animation);
-    bool loadAnimationFromJson(const String &jsonString);
-    bool saveAnimations();
     bool getCountDownActive();
+
     int getCurrentAnimationIndex();
+    bool setCurrentAnimationIndex(u_int8_t p_index);
+
     void tick();
-    void serializeAnimation(const Animation& animation, JsonObject& animObj);
 };

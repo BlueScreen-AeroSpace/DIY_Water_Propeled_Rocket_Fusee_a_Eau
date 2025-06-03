@@ -1,21 +1,20 @@
 #include "Animation/Frame.h"
 
-Frame::Frame(uint16_t duration)
+Frame::Frame()
 {
-    this->duration = duration;
-}
 
-uint16_t Frame::getDuration() const
-{
-    return duration;
 }
-
-void Frame::addPixel(Pixel pixel)
+void Frame::addPixel(const Pixel& pixel)
 {
     pixels.push_back(pixel);
 }
 
-std::vector<Pixel> &Frame::getPixels()
+const std::vector<Pixel> &Frame::getPixels() const
 {
     return pixels;
+}
+
+uint16_t Frame::getNumPixels() const
+{
+    return this->pixels.size();
 }

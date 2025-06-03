@@ -5,7 +5,7 @@ Animation::Animation()
     ;
 }
 
-void Animation::addFrame(Frame frame)
+void Animation::addFrame(const Frame& frame)
 {
     this->frames.push_back(frame);
 }
@@ -28,6 +28,21 @@ void Animation::setName(const String &name)
 const String& Animation::getName() const
 {
     return name;
+}
+
+String Animation::getNameNormalized() const
+{
+    String name = this->getName();
+    name.trim();
+    name.toLowerCase();
+    name.replace(' ', '-');
+
+    return name;
+}
+
+uint8_t Animation::getNumFrames() const
+{
+    return this->frames.size();
 }
 
 int Animation::getCurrentFrameIndex()

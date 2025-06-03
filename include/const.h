@@ -4,6 +4,7 @@
 
 #define EMPTY ""
 #define DEFAULT_ZERO 0
+#define INTERVAL_90 90000 // 90 secondes
 #define INTERVAL_15 15000 // 15 secondes
 #define INTERVAL_5 5000   // 5 secondes
 #define INTERVAL_4 4000
@@ -15,6 +16,7 @@
 #define INTERVAL_300 300
 #define INTERVAL_200 200
 #define INTERVAL_100 100
+#define INTERVAL_75 75
 #define INTERVAL_50 50 // 50 millisecondes
 #define INTERVAL_40 40
 #define INTERVAL_30 30
@@ -53,7 +55,7 @@
 // servo motor
 #define SERVO_PIN 26
 #define START_POS 90
-#define ROTATE_90 0
+#define ROTATE_90 180
 
 // ChuteManager , marge d'erreur de 2 metre ou 2 metres seconde pour l'altitude et la vitesse
 #define MARGIN_ERROR 1.5f

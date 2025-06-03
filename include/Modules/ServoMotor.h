@@ -12,6 +12,5 @@ private:
     
 public:
     ServoMotor();
-    void RotateToStartPosition();
-    void Rotate90();
+    void rotate(uint8_t p_position);
 };
